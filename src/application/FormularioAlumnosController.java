@@ -29,22 +29,13 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
-import modelo.Alumno;
-import modelo.Carrera;
-import modelo.CentroEstudio;
 import modelo.Conexion;
 import modelo.*;
+import java.awt.event.*;
 
 public class FormularioAlumnosController implements Initializable {
     //Columnas
-    //@FXML private TableColumn<Alumno,String> clmnNombre;
 
-    /*@FXML private TableColumn<Alumno,String> clmnApellido;
-	@FXML private TableColumn<Alumno,Number> clmnEdad;
-	@FXML private TableColumn<Alumno,String> clmnGenero;
-	@FXML private TableColumn<Alumno,Date> clmnFechaIngreso;
-	@FXML private TableColumn<Alumno,CentroEstudio> clmnCentroEstudio;
-	@FXML private TableColumn<Alumno,Carrera> clmnCarrera;*/
     @FXML
     private TableColumn<Animal, String> clmnNombre;
     @FXML
@@ -56,6 +47,10 @@ public class FormularioAlumnosController implements Initializable {
     @FXML
     private TextField txtNombre;
     @FXML
+    private DatePicker dtpkEntrada;
+    @FXML
+    private DatePicker dtpkSortida;
+    @FXML
     private TextField txtFilter;
     @FXML
     private TextField txtEdad;
@@ -66,32 +61,27 @@ public class FormularioAlumnosController implements Initializable {
     private Button btnEliminar;
     @FXML
     private Button btnActualizar;
-     @FXML
+    @FXML
     private Button btnParcela;
 
     @FXML
     private ComboBox<Parcela> cmbCentroEstudio;
 
-    /*@FXML private ComboBox<Carrera> cmbCarrera;
-	@FXML private ComboBox<CentroEstudio> cmbCentroEstudio;*/
     @FXML
     private TableView<Animal> tblViewAlumnos;
     //@FXML
     //private TableView<Animal> tblViewAnimal;
     //Colecciones
-    // private ObservableList<Carrera> listaCarreras;
-    // private ObservableList<CentroEstudio> listaCentrosEstudios;
-    //private ObservableList<Alumno> listaAlumnos;
-    // private ObservableList<Animal> listaAlumnos;
+
     private ObservableList<Animal> listaAnimal;
     private ObservableList<Parcela> lista;
 
     private Conexion conexion;
 
-  @FXML
-    public void filtar(KeyEvent key) {
-        FilteredList <Animal> filterData = new FilteredList <>(listaAnimal, p -> true);
-        //FilteredList<Animal> filterData = new FilteredList<>(listaAnimal, p -> true);
+    @FXML
+   
+    public void filtar(String key) {
+        FilteredList<Animal> filterData = new FilteredList<>(listaAnimal, p -> true);
 
         txtFilter.textProperty().addListener((observable, oldValue, newValue) -> {
             filterData.setPredicate(Animal -> {
@@ -119,68 +109,30 @@ public class FormularioAlumnosController implements Initializable {
         conexion.establecerConexion();
 
         //Inicializar listas
-        //listaCentrosEstudios = FXCollections.observableArrayList();
-        //listaAlumnos = FXCollections.observableArrayList();
         listaAnimal = FXCollections.observableArrayList();
         lista = FXCollections.observableArrayList();
 
         //Llenar listas
-        //Carrera.llenarInformacion(conexion.getConnection(), listaCarreras);
         Parcela.llenarInformacion(conexion.getConnection(), lista);
 
-        //Alumno.llenarInformacionAlumnos(conexion.getConnection(), listaAlumnos);
         Animal.llenarInformacionAnimal(conexion.getConnection(), listaAnimal);
 
         //Enlazar listas con ComboBox y TableView
-        // cmbCarrera.setItems(listaCarreras);
-        // cmbCentroEstudio.setItems(listaCentrosEstudios);
-        //tblViewAlumnos.setItems(listaAlumnos);
         tblViewAlumnos.setItems(listaAnimal);
         cmbCentroEstudio.setItems(lista);
 
         //Enlazar columnas con atributos
-        // txtCodigo.setCellValueFactory(new PropertyValueFactory<Animal, Integer>("codigo"));
         clmnNombre.setCellValueFactory(new PropertyValueFactory<Animal, String>("nom_animal"));
-        // clmnApellido.setCellValueFactory(new PropertyValueFactory<Alumno, String>("apellido"));
-        //clmnGenero.setCellValueFactory(new PropertyValueFactory<Alumno, String>("genero"));
-        // clmnFechaIngreso.setCellValueFactory(new PropertyValueFactory<Alumno, Date>("fechaIngreso"));
+
         clmnCentroEstudio.setCellValueFactory(new PropertyValueFactory<Animal, Parcela>("estable"));
-        //clmnCarrera.setCellValueFactory(new PropertyValueFactory<Alumno, Carrera>("carrera"));
+
         gestionarEventos();
 
         conexion.cerrarConexion();
     }
 
     public void gestionarEventos() {
-        /*tblViewAlumnos.getSelectionModel().selectedItemProperty().addListener(
-                new ChangeListener<Alumno>() {
-            @Override
-            public void changed(ObservableValue<? extends Alumno> arg0,
-                    Alumno valorAnterior, Alumno valorSeleccionado) {
-                if (valorSeleccionado != null) {
-                    txtCodigo.setText(String.valueOf(valorSeleccionado.getCodigoAlumno()));
-                    txtNombre.setText(valorSeleccionado.getNombre());
-                    txtApellido.setText(valorSeleccionado.getApellido());
-                    txtEdad.setText(String.valueOf(valorSeleccionado.getEdad()));
-                    if (valorSeleccionado.getGenero().equals("F")) {
-                        rbtFemenino.setSelected(true);
-                        rbtMasculino.setSelected(false);
-                    } else if (valorSeleccionado.getGenero().equals("M")) {
-                        rbtFemenino.setSelected(false);
-                        rbtMasculino.setSelected(true);
-                    }
-                    dtpkrFecha.setValue(valorSeleccionado.getFechaIngreso().toLocalDate());
-                    cmbCarrera.setValue(valorSeleccionado.getCarrera());
-                    cmbCentroEstudio.setValue(valorSeleccionado.getCentroEstudio());
 
-                    btnGuardar.setDisable(true);
-                    btnEliminar.setDisable(false);
-                    btnActualizar.setDisable(false);
-                }
-            }
-
-        }
-        );*/
         tblViewAlumnos.getSelectionModel().selectedItemProperty().addListener(
                 new ChangeListener<Animal>() {
             @Override
@@ -189,23 +141,15 @@ public class FormularioAlumnosController implements Initializable {
                 if (valorSeleccionado != null) {
                     txtCodigo.setText(String.valueOf(valorSeleccionado.getCodi_animal()));
                     txtNombre.setText(valorSeleccionado.getNom_animal());
-                    /*  txtApellido.setText(valorSeleccionado.getApellido());*/
-                    //txtEdad.setText(String.valueOf(valorSeleccionado.getEstable().getCodi_estable()));
-                    /* if (valorSeleccionado.getGenero().equals("F")) {
-                        rbtFemenino.setSelected(true);
-                        rbtMasculino.setSelected(false);
-                    } else if (valorSeleccionado.getGenero().equals("M")) {
-                        rbtFemenino.setSelected(false);
-                        rbtMasculino.setSelected(true);
-                    }*/
- /*dtpkrFecha.setValue(valorSeleccionado.getFechaIngreso().toLocalDate());
-                    cmbCarrera.setValue(valorSeleccionado.getCarrera());*/
-                    cmbCentroEstudio.setValue(valorSeleccionado.getEstable());
 
+                    cmbCentroEstudio.setValue(valorSeleccionado.getEstable());
+                    dtpkEntrada.setValue(valorSeleccionado.getData_entrada().toLocalDate());
+                    dtpkSortida.setValue(valorSeleccionado.getData_sortida().toLocalDate());
                     btnGuardar.setDisable(true);
                     btnEliminar.setDisable(false);
                     btnActualizar.setDisable(false);
                 }
+
             }
 
         }
@@ -218,29 +162,18 @@ public class FormularioAlumnosController implements Initializable {
         Animal a = new Animal(
                 Integer.valueOf(txtCodigo.getText()),
                 txtNombre.getText(),
-                // Integer.valueOf(txtEdad.getText())
-                cmbCentroEstudio.getSelectionModel().getSelectedItem()
-        //Integer.valueOf(txtEdad.getText())
-        );
-        
-        
-        //
-        //Integer.valueOf(txtEdad.getText())
-        /* rbtFemenino.isSelected() ? "F" : "M",//Condicion?ValorVerdadero:ValorFalso
-                Date.valueOf(dtpkrFecha.getValue()),
                 cmbCentroEstudio.getSelectionModel().getSelectedItem(),
-                cmbCarrera.getSelectionModel().getSelectedItem()*/
+                Date.valueOf(dtpkEntrada.getValue()),
+                Date.valueOf(dtpkSortida.getValue())
+        );
 
         //Llamar al metodo guardarRegistro de la clase Alumno
         conexion.establecerConexion();
-        Integer animals =  Integer.valueOf(txtCodigo.getText());
-        
-       
+        Integer animals = Integer.valueOf(txtCodigo.getText());
+
         int resultado = a.guardarRegistro(conexion.getConnection());
         int Resultado = a.Disponibilitat(conexion.getConnection());
         conexion.cerrarConexion();
-        
-        
 
         if (resultado == 1) {
             listaAnimal.add(a);
@@ -258,19 +191,15 @@ public class FormularioAlumnosController implements Initializable {
         Animal a = new Animal(
                 Integer.valueOf(txtCodigo.getText()),
                 txtNombre.getText(),
-                //Integer.valueOf(textEdad.getText())
-
-                cmbCentroEstudio.getSelectionModel().getSelectedItem()
+                cmbCentroEstudio.getSelectionModel().getSelectedItem(),
+                Date.valueOf(dtpkEntrada.getValue()),
+                Date.valueOf(dtpkSortida.getValue())
         );
 
-        //txtApellido.getText(),
-        //Integer.valueOf(txtEdad.getText()),
-        //rbtFemenino.isSelected() ? "F" : "M",//Condicion?ValorVerdadero:ValorFalso
         // Date.valueOf(dtpkrFecha.getValue()),
-        //cmbCentroEstudio.getSelectionModel().getSelectedItem());
-        //cmbCarrera.getSelectionModel().getSelectedItem());
         conexion.establecerConexion();
         int resultado = a.actualizarRegistro(conexion.getConnection());
+        int Resultado = a.Disponibilitat(conexion.getConnection());
         conexion.cerrarConexion();
 
         if (resultado == 1) {
@@ -288,6 +217,14 @@ public class FormularioAlumnosController implements Initializable {
     public void eliminarRegistro() {
         conexion.establecerConexion();
         int resultado = tblViewAlumnos.getSelectionModel().getSelectedItem().eliminarRegistro(conexion.getConnection());
+        Animal a = new Animal(
+                Integer.valueOf(txtCodigo.getText()),
+                txtNombre.getText(),
+                cmbCentroEstudio.getSelectionModel().getSelectedItem(),
+                Date.valueOf(dtpkEntrada.getValue()),
+                Date.valueOf(dtpkSortida.getValue())
+        );
+        int Resultado = a.Disponibilitat(conexion.getConnection());
         conexion.cerrarConexion();
 
         if (resultado == 1) {
@@ -306,21 +243,18 @@ public class FormularioAlumnosController implements Initializable {
         txtCodigo.setText(null);
         txtNombre.setText(null);
 
-        //txtEdad.setText(null);
-
-        //cmbCarrera.setValue(null);
         cmbCentroEstudio.setValue(null);
 
         btnGuardar.setDisable(false);
         btnEliminar.setDisable(true);
         btnActualizar.setDisable(true);
     }
-    
-    public void cambiarScenaParcela(javafx.event.ActionEvent actionEvent)throws IOException {
-        AnchorPane estables = (AnchorPane)FXMLLoader.load(getClass().getResource("Parceles.fxml"));
+
+    public void cambiarScenaParcela(javafx.event.ActionEvent actionEvent) throws IOException {
+        AnchorPane estables = (AnchorPane) FXMLLoader.load(getClass().getResource("Parceles.fxml"));
         Scene sceneEstables = new Scene(estables);
 
-        Stage window = (Stage)((Node)actionEvent.getSource()).getScene().getWindow();
+        Stage window = (Stage) ((Node) actionEvent.getSource()).getScene().getWindow();
         window.setScene(sceneEstables);
         window.show();
     }

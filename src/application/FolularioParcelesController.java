@@ -7,7 +7,11 @@ package application;
  */
 import java.io.IOException;
 import java.net.URL;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ResourceBundle;
+import javafx.application.Application;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
@@ -30,31 +34,31 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
 import modelo.*;
+
 /**
  *
  * @author ferran
  */
-public class FolularioParcelesController implements Initializable {
-    
-    
-  
-  //Columnas
-    
-     @FXML
+public class FolularioParcelesController extends Application implements Initializable  {
+
+    Statement stmt = null;
+    Integer numDisponible;
+
+    //Columnas
+    @FXML
     private TableColumn<Parcela, String> clmnNom;
     @FXML
     private TableColumn<Parcela, Number> quantitat;
-    
-     @FXML
+
+    @FXML
     private TableColumn<Parcela, Number> disponible;
-    
+
     //Componentes GUI
-    
-     @FXML
+    @FXML
     private TextField txtCodi;
     @FXML
     private TextField txtNom;
-  
+
     @FXML
     private TextField txtQuantitat;
 
@@ -64,17 +68,16 @@ public class FolularioParcelesController implements Initializable {
     private Button btnEliminar;
     @FXML
     private Button btnActualizar;
-     @FXML
+    @FXML
     private Button btnAnimals;
 
-    
-     @FXML
+    @FXML
     private TableView<Parcela> tblViewParcela;
-     
-      private ObservableList<Parcela> lista;
-      private modelo.Conexion conexion;
-      
-       @Override
+
+    private ObservableList<Parcela> lista;
+    private modelo.Conexion conexion;
+
+    @Override
     public void initialize(URL location, ResourceBundle resources) {
         conexion = new modelo.Conexion();
         conexion.establecerConexion();
@@ -87,8 +90,6 @@ public class FolularioParcelesController implements Initializable {
         //Llenar listas
         Parcela.llenarInformacion(conexion.getConnection(), lista);
 
-        
-
         //Enlazar listas con ComboBox y TableView
         tblViewParcela.setItems(lista);
 
@@ -100,9 +101,9 @@ public class FolularioParcelesController implements Initializable {
 
         conexion.cerrarConexion();
     }
-    
+
     public void gestionarEventos() {
-       
+
         tblViewParcela.getSelectionModel().selectedItemProperty().addListener(
                 new ChangeListener<Parcela>() {
             @Override
@@ -111,9 +112,8 @@ public class FolularioParcelesController implements Initializable {
                 if (valorSeleccionado != null) {
                     txtCodi.setText(String.valueOf(valorSeleccionado.getCodi_estable()));
                     txtNom.setText(valorSeleccionado.getNom_estable());
-                
-                   txtQuantitat.setText(String.valueOf(valorSeleccionado.getQuantitat()));
-                   
+
+                    txtQuantitat.setText(String.valueOf(valorSeleccionado.getQuantitat()));
 
                     btnGuardar.setDisable(true);
                     btnEliminar.setDisable(false);
@@ -127,24 +127,20 @@ public class FolularioParcelesController implements Initializable {
 
     @FXML
     public void guardarRegistro() {
-         
+
         //Crear una nueva instancia del tipo Alumno
         Parcela a = new Parcela(
                 Integer.valueOf(txtCodi.getText()),
                 txtNom.getText(),
-                // Integer.valueOf(txtEdad.getText())
-                 Integer.valueOf(txtQuantitat.getText()),
-                null
+                Integer.valueOf(txtQuantitat.getText()),
+                Integer.valueOf(txtQuantitat.getText())
                 
-                
-                
-        
         );
-        
 
         //Llamar al metodo guardarRegistro de la clase Alumno
         conexion.establecerConexion();
         int resultado = a.guardarRegistro(conexion.getConnection());
+        
         conexion.cerrarConexion();
 
         if (resultado == 1) {
@@ -160,14 +156,23 @@ public class FolularioParcelesController implements Initializable {
 
     @FXML
     public void actualizarRegistro() {
+      
+         Parcela b = new Parcela(
+                Integer.valueOf(txtCodi.getText()),
+                txtNom.getText(),
+                Integer.valueOf(txtQuantitat.getText()),
+                0
+        );
+         conexion.establecerConexion();
+       int Resultado = b.Actualitza(conexion.getConnection());
+        System.out.println("Resultat de la funció actualitzar: "+Resultado);
+                conexion.cerrarConexion();
+
         Parcela a = new Parcela(
                 Integer.valueOf(txtCodi.getText()),
                 txtNom.getText(),
-                //Integer.valueOf(textEdad.getText())
-
                 Integer.valueOf(txtQuantitat.getText()),
-                null
-               
+                Resultado
         );
 
         //txtApellido.getText(),
@@ -216,18 +221,23 @@ public class FolularioParcelesController implements Initializable {
         txtQuantitat.setText(null);
 
         //cmbCarrera.setValue(null);
-
         btnGuardar.setDisable(false);
         btnEliminar.setDisable(true);
         btnActualizar.setDisable(true);
     }
-    public void cambiarScenaAnimals(javafx.event.ActionEvent actionEvent)throws IOException {
-        AnchorPane estables = (AnchorPane)FXMLLoader.load(getClass().getResource("FormularioAlumnos.fxml"));
+
+    public void cambiarScenaAnimals(javafx.event.ActionEvent actionEvent) throws IOException {
+        AnchorPane estables = (AnchorPane) FXMLLoader.load(getClass().getResource("FormularioAlumnos.fxml"));
         Scene sceneEstables = new Scene(estables);
 
-        Stage window = (Stage)((Node)actionEvent.getSource()).getScene().getWindow();
+        Stage window = (Stage) ((Node) actionEvent.getSource()).getScene().getWindow();
         window.setScene(sceneEstables);
         window.show();
     }
-    
+
+    @Override
+    public void start(Stage primaryStage) throws Exception {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
 }

@@ -14,7 +14,7 @@ import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.collections.ObservableList;
-
+/*
 public class Alumno{
 	private IntegerProperty codigoAlumno;
 	private StringProperty nombre;
@@ -229,4 +229,4 @@ public class Alumno{
 			e.printStackTrace();
 		}
 	}
-}
+}*/
